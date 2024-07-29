@@ -1,4 +1,4 @@
-#include "../includes/ft_ping.h"
+#include "../includes/ft_traceroute.h"
 
 unsigned short checksum(void *b, int len) {
 	unsigned short *buf = b; 
@@ -43,31 +43,4 @@ long double get_ping_duration(struct timespec *time_start, struct timespec *time
     rtt_msec += (time_end->tv_nsec - time_start->tv_nsec) / 1000000.0;
 	
 	return rtt_msec;
-}
-
-long double calculate_average(t_data *data) {
-    long double sum = 0.0;
-    for (int i = 0; i < data->sequence; i++) {
-        sum += data->rtt_arr[i];
-    }
-    return sum / data->sequence;
-}
-
-long double calculate_stddev(t_data *data) {
-    long double avg = calculate_average(data);
-    long double sum_sq_diff = 0.0;
-    for (int i = 0; i < data->sequence; i++) {
-        sum_sq_diff += (data->rtt_arr[i] - avg) * (data->rtt_arr[i] - avg);
-    }
-    return sqrt(sum_sq_diff / data->sequence);
-}
-
-void print_packet_content(t_data *data, t_icmp_pckt *pckt) {
-
-	printf("\npckt type: %d\n",pckt->hdr.type);
-	printf("pckt code: %d\n", pckt->hdr.code);
-	printf("pckt pid: %d\n", pckt->hdr.un.echo.id);
-	printf("pckt checksum: %d\n", pckt->hdr.checksum);
-	printf("payload size: %hhu\n", data->payload_size);
-	printf("payload: %s \n", pckt->payload);
 }

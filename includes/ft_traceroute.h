@@ -24,6 +24,7 @@ typedef struct	s_data {
 
     int32_t			sockfd;
     uint8_t    		payload_size;
+    uint8_t    		max_ttl;
     double			sleep_time;
     char			*dns_name;
     char 			*ip_addr;

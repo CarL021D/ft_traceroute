@@ -23,6 +23,7 @@ void	init_data(t_data *data, int ac, char **av) {
 		exit(EXIT_FAILURE);
 	}
 	data->payload_size = 56;
+	data->max_ttl = 64;
 	data->dns_name = av[ac - 1];
 	data->sequence = 0;
 }

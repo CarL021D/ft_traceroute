@@ -19,12 +19,12 @@ void	init_data(t_data *data, int ac, char **av) {
 		exit(EXIT_FAILURE);
 
 	if ((data->sockfd = init_icmp_socket()) < 0) {
-		
 		fprintf(stderr, "Failed to initialize socket\n");
 		exit(EXIT_FAILURE);
 	}
 	data->payload_size = 56;
 	data->dns_name = av[ac - 1];
+	data->sequence = 0;
 }
 
 void init_sock_addr(struct sockaddr_in *addr_con, char *ip_addr) {    
@@ -35,7 +35,7 @@ void init_sock_addr(struct sockaddr_in *addr_con, char *ip_addr) {
 	addr_con->sin_addr.s_addr = inet_addr(ip_addr);
 }
 
-void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data) {
+void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data, uint16_t ttl) {
 
 	memset(pckt, 0, sizeof(t_icmp_pckt));
 	pckt->hdr.type = ICMP_ECHO;
@@ -48,5 +48,9 @@ void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data) {
     	pckt->payload[i] = (rand() % 95) + 32;
     pckt->payload[data->payload_size - 1] = '\0';
 	pckt->hdr.checksum = checksum(pckt, sizeof(t_icmp_pckt));
+
+	if (setsockopt(data->sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
+		error_exit_program(data, "setsockopt error");
+
 }
 

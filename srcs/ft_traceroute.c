@@ -23,6 +23,12 @@ void check_args_count(int ac, char **av) {
 	}
 }
 
+void print_traceroute_first_output(t_data *data) {
+	
+		printf("traceroute to %s (%s), 64 hops max\n", data->dns_name,
+				data->ip_addr);
+}
+
 void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 
     t_icmp_pckt pckt;
@@ -31,16 +37,22 @@ void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 	char buffer[sizeof(struct iphdr) + sizeof(t_icmp_pckt)];
 	// long double rtt_msec;
 
-    init_icmp_pckt(&pckt, data);
-	// clock_gettime(CLOCK_MONOTONIC, &time_start);
+    uint16_t ttl = 0;
 
-	if (sendto(data->sockfd, &pckt, sizeof(t_icmp_pckt), 0, (struct sockaddr *)addr_con, sizeof(*addr_con)) <= 0)
-		error_exit_program(data, "sendto error");
+    for (uint16_t i = 0; i < 3; i++) {
 
-    if (recvfrom(data->sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)addr_con, &addr_len) <= 0)
-			error_exit_program(data, "recvfrom error");
+        init_icmp_pckt(&pckt, data, ttl + 1);
+        // clock_gettime(CLOCK_MONOTONIC, &time_start);
+                       
+        if (sendto(data->sockfd, &pckt, sizeof(t_icmp_pckt), 0, (struct sockaddr *)addr_con, sizeof(*addr_con)) <= 0)
+            error_exit_program(data, "sendto error");
 
+        if (recvfrom(data->sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)addr_con, &addr_len) <= 0)
+                error_exit_program(data, "recvfrom error");        
+    }
+    
     printf("Packet received");
+
 }
 
 int main(int ac, char **av) {
@@ -52,7 +64,7 @@ int main(int ac, char **av) {
 	check_args_count(ac, av);
 	init_data(&data, ac, av);
 	init_sock_addr(&addr_con, data.ip_addr);
-	// print_ping_first_output(&data);
+	print_traceroute_first_output(&data);
 
 	// while (!c_sig) {
 		trace_pckt_route(&data, &addr_con);

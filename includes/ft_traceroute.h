@@ -44,7 +44,7 @@ typedef struct	s_icmp_pckt {
 
 void	init_sock_addr(struct sockaddr_in *addr_con, char *ip_addr);
 void	init_data(t_data *data, int ac, char **av);
-void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data);
+void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data, uint16_t ttl);
 
 unsigned short 	checksum(void *b, int len);
 char			*resolve_hostname_to_ip(const char *hostname);

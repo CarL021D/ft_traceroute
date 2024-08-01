@@ -28,30 +28,32 @@ void	init_data(t_data *data, int ac, char **av) {
 	data->sequence = 0;
 }
 
-void init_sock_addr(struct sockaddr_in *addr_con, char *ip_addr) {    
+void init_sock_addr(t_data *data, struct sockaddr_in *addr_con, char *ip_addr) {    
 	
 	memset(addr_con, 0, sizeof(struct sockaddr_in));
 	addr_con->sin_family = AF_INET;
+	if (inet_pton(AF_INET, data->ip_addr, &addr_con->sin_addr) <= 0) {
+        fprintf(stderr, "inet_pton error for %s\n", data->ip_addr);
+        exit(EXIT_FAILURE);
+    }
 	addr_con->sin_port = htons(0);
 	addr_con->sin_addr.s_addr = inet_addr(ip_addr);
 }
 
 void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data, uint16_t ttl) {
 
+	setsockopt(data->sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl));
+		// if (setsockopt(data->sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
+		// 	error_exit_program(data, "setsockopt error");
+
 	memset(pckt, 0, sizeof(t_icmp_pckt));
 	pckt->hdr.type = ICMP_ECHO;
 	pckt->hdr.code = 0;
 	pckt->hdr.un.echo.id = getpid();
-	pckt->hdr.checksum = 0;
-	pckt->hdr.un.echo.sequence = data->sequence;
+	pckt->hdr.un.echo.sequence = ttl;
 
-	for (uint16_t i = 0; i < data->payload_size - 1; i++)
-    	pckt->payload[i] = (rand() % 95) + 32;
-    pckt->payload[data->payload_size - 1] = '\0';
+	// for (uint16_t i = 0; i < data->payload_size; i++)
+	//     pckt->payload[i] = '\0';
 	pckt->hdr.checksum = checksum(pckt, sizeof(t_icmp_pckt));
-
-	if (setsockopt(data->sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
-		error_exit_program(data, "setsockopt error");
-
+	// (void)ttl;
 }
-

@@ -17,7 +17,6 @@ void check_args_count(int ac, char **av) {
 
 	for (uint8_t i = 1; i < ac; i++) {
 		if (!strcmp(av[i], "-?") || !strcmp(av[i], "--help")) {
-			// help_option_exec();
 			exit(EXIT_SUCCESS);
 		}
 	}
@@ -31,7 +30,7 @@ void print_traceroute_first_output(t_data *data) {
 
 static bool wait_response(t_data *data)
 {
-	struct timeval tv = {0, 100000};
+	struct timeval tv = {1, 0};
 
 	fd_set readfds;
 	FD_ZERO(&readfds);
@@ -47,14 +46,13 @@ static bool wait_response(t_data *data)
 
 static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, uint16_t ttl, uint8_t sequence, long double rtt_msec) {
 
-	if (!sequence)
-		printf("   %d", ttl);
 	if (!sequence || (icmp_hdr->type == ICMP_ECHOREPLY && !sequence))
 		printf("   %s", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
 	if (icmp_hdr->type == ICMP_TIME_EXCEEDED || icmp_hdr->type == ICMP_ECHOREPLY)
 		printf("   %.3Lfms", rtt_msec);
 	else 
-		printf("\t*");
+		printf("   *");
+	(void)ttl;
 }
 
 void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
@@ -76,9 +74,10 @@ void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 			struct sockaddr_in rcv_addr_con;
 			socklen_t addr_len = sizeof(rcv_addr_con);
 
-			if (!wait_response(data)) {
-				printf("%2d  *", ttl);
-			} else {
+			if (!sequence)
+					printf("   %d", ttl);
+
+			if (wait_response(data)) {
 				if (recvfrom(data->sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&rcv_addr_con, &addr_len) <= 0)
 					error_exit_program(data, "recvfrom error");
 					
@@ -91,12 +90,14 @@ void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 				memcpy(&rcvd_pckt.hdr, icmp_hdr, sizeof(struct icmphdr));
 				memcpy(rcvd_pckt.payload, buffer + (ip_hdr->ihl * 4) + sizeof(struct icmphdr), PAYLOAD_SIZE);
 			
-				print_route_infos(ip_hdr, icmp_hdr, ttl, sequence, rtt_msec);
-				
+				print_route_infos(ip_hdr, icmp_hdr, ttl, sequence, rtt_msec);	
 				if (sequence == 2 && icmp_hdr->type == ICMP_ECHOREPLY) {
 					printf("\n");
 					return;
 				}
+			}
+			else {
+				printf("   *");
 			}
 		}
 		printf("\n");

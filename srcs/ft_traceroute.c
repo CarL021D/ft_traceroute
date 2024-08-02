@@ -27,7 +27,6 @@ void print_traceroute_first_output(t_data *data) {
 	
 		printf("traceroute to %s (%s), 64 hops max\n", data->dns_name,
 				data->ip_addr);
-    (void)data;
 }
 
 static bool wait_response(t_data *data)

@@ -1,13 +1,5 @@
 #include "../includes/ft_traceroute.h"
 
-volatile sig_atomic_t c_sig = 0;
-
-void sig_handler(int _)
-{
-	(void)_;
-	c_sig = 1;
-}
-
 void check_args_count(int ac, char **av) {
 
 	if (ac < 2) {
@@ -57,7 +49,7 @@ static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, ui
 
 void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 
-    for (uint16_t ttl = 1; ttl <= 64; ttl++) {
+	for (uint16_t ttl = 1; ttl <= 64; ttl++) {
 
 		for (uint8_t sequence = 0; sequence < 3; sequence++) {
 
@@ -114,13 +106,6 @@ int main(int ac, char **av) {
 	init_data(&data, ac, av);
 	init_sock_addr(&data, &addr_con, data.ip_addr);
 	print_traceroute_first_output(&data);
-
-	// while (!c_sig) {
-		trace_pckt_route(&data, &addr_con);
-		// usleep(1 * 1000000);
-	// }
-
-	// traceroute_exit_output(&data);
-	// free(data.rtt_arr);
+	trace_pckt_route(&data, &addr_con);
 	close(data.sockfd);
 }

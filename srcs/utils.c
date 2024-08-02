@@ -34,19 +34,6 @@ char *resolve_hostname_to_ip(const char *hostname) {
 	return ip_addr;
 }
 
-bool is_private_ip(const char *ip_str) {
-    struct in_addr addr;
-    inet_aton(ip_str, &addr);
-    uint32_t ip = ntohl(addr.s_addr);
-
-    if ((ip >= 0x0A000000 && ip <= 0x0AFFFFFF) ||
-        (ip >= 0xAC100000 && ip <= 0xAC1FFFFF) ||
-        (ip >= 0xC0A80000 && ip <= 0xC0A8FFFF)) {
-        return true;
-    }
-    return false;
-}
-
 long double get_ping_duration(struct timespec *time_start, struct timespec *time_end) {
 
 	long double rtt_msec;

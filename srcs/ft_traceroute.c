@@ -46,56 +46,61 @@ static bool wait_response(t_data *data)
 	return true;
 }
 
-void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
+static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, uint16_t ttl, uint8_t sequence, long double rtt_msec) {
 
+	if (!sequence)
+		printf("   %d", ttl);
+	if (!sequence || (icmp_hdr->type == ICMP_ECHOREPLY && !sequence))
+		printf("   %s", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
+	if (icmp_hdr->type == ICMP_TIME_EXCEEDED || icmp_hdr->type == ICMP_ECHOREPLY)
+		printf("   %.3Lfms", rtt_msec);
+	else 
+		printf("\t*");
+}
+
+void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 
     for (uint16_t ttl = 1; ttl <= 64; ttl++) {
 
-		t_icmp_pckt pckt;
-		char buffer[sizeof(struct iphdr) + sizeof(t_icmp_pckt)];
-		struct timespec time_start, time_end;
+		for (uint8_t sequence = 0; sequence < 3; sequence++) {
 
-		init_icmp_pckt(&pckt, data, ttl);
-		memset(buffer, 0, sizeof(buffer));
-        clock_gettime(CLOCK_MONOTONIC, &time_start);
-        if (sendto(data->sockfd, &pckt, sizeof(pckt), 0, (struct sockaddr *)addr_con, sizeof(*addr_con)) <= 0)
-            error_exit_program(data, "sendto error");
+			t_icmp_pckt pckt;
+			char buffer[sizeof(struct iphdr) + sizeof(t_icmp_pckt)];
+			struct timespec time_start, time_end;
 
-			
+			init_icmp_pckt(&pckt, data, ttl);
+			memset(buffer, 0, sizeof(buffer));
+			clock_gettime(CLOCK_MONOTONIC, &time_start);
+			if (sendto(data->sockfd, &pckt, sizeof(pckt), 0, (struct sockaddr *)addr_con, sizeof(*addr_con)) <= 0)
+				error_exit_program(data, "sendto error");
 
-		struct sockaddr_in rcv_addr_con;
-	      socklen_t addr_len = sizeof(rcv_addr_con);
+			struct sockaddr_in rcv_addr_con;
+			socklen_t addr_len = sizeof(rcv_addr_con);
 
-		if (!wait_response(data)) {
-        	printf("%2d  *", ttl);
-		} else {
-			if (recvfrom(data->sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&rcv_addr_con, &addr_len) <= 0)
-				error_exit_program(data, "recvfrom error");
-				
-			long double rtt_msec = get_ping_duration(&time_start, &time_end);
-
-			t_icmp_pckt rcvd_pckt;
-			struct iphdr *ip_hdr = (struct iphdr *)buffer;
-			struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + (ip_hdr->ihl * 4));
-
-			memcpy(&rcvd_pckt.hdr, icmp_hdr, sizeof(struct icmphdr));
-			memcpy(rcvd_pckt.payload, buffer + (ip_hdr->ihl * 4) + sizeof(struct icmphdr), PAYLOAD_SIZE);
-		
-			if (icmp_hdr->type == ICMP_TIME_EXCEEDED) {
-
-				printf("  %d    %s", ttl, inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
-				printf("  %.3Lfms", rtt_msec);
-				printf("\n");
-			} else if (icmp_hdr->type == ICMP_ECHOREPLY) {
-				printf("  %d    %s", ttl, inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
-				printf("  %.3Lfms", rtt_msec);
-				printf("\n");
-				return;
+			if (!wait_response(data)) {
+				printf("%2d  *", ttl);
 			} else {
-				printf("	*");
-				printf("\n");
-			}	        
-    	}
+				if (recvfrom(data->sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&rcv_addr_con, &addr_len) <= 0)
+					error_exit_program(data, "recvfrom error");
+					
+				long double rtt_msec = get_ping_duration(&time_start, &time_end);
+
+				t_icmp_pckt rcvd_pckt;
+				struct iphdr *ip_hdr = (struct iphdr *)buffer;
+				struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + (ip_hdr->ihl * 4));
+
+				memcpy(&rcvd_pckt.hdr, icmp_hdr, sizeof(struct icmphdr));
+				memcpy(rcvd_pckt.payload, buffer + (ip_hdr->ihl * 4) + sizeof(struct icmphdr), PAYLOAD_SIZE);
+			
+				print_route_infos(ip_hdr, icmp_hdr, ttl, sequence, rtt_msec);
+				
+				if (sequence == 2 && icmp_hdr->type == ICMP_ECHOREPLY) {
+					printf("\n");
+					return;
+				}
+			}
+		}
+		printf("\n");
 	}  
 }
 

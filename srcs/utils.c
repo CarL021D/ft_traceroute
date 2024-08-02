@@ -34,13 +34,26 @@ char *resolve_hostname_to_ip(const char *hostname) {
 	return ip_addr;
 }
 
+bool is_private_ip(const char *ip_str) {
+    struct in_addr addr;
+    inet_aton(ip_str, &addr);
+    uint32_t ip = ntohl(addr.s_addr);
+
+    if ((ip >= 0x0A000000 && ip <= 0x0AFFFFFF) ||
+        (ip >= 0xAC100000 && ip <= 0xAC1FFFFF) ||
+        (ip >= 0xC0A80000 && ip <= 0xC0A8FFFF)) {
+        return true;
+    }
+    return false;
+}
+
 long double get_ping_duration(struct timespec *time_start, struct timespec *time_end) {
 
 	long double rtt_msec;
 
 	clock_gettime(CLOCK_MONOTONIC, time_end);
-    rtt_msec = (time_end->tv_sec - time_start->tv_sec) * 1000.0;
-    rtt_msec += (time_end->tv_nsec - time_start->tv_nsec) / 1000000.0;
+	rtt_msec = (time_end->tv_sec - time_start->tv_sec) * 1000.0;
+	rtt_msec += (time_end->tv_nsec - time_start->tv_nsec) / 1000000.0;
 	
 	return rtt_msec;
 }

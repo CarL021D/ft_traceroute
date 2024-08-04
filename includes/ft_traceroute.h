@@ -20,6 +20,12 @@
 
 #define PAYLOAD_SIZE 56
 
+typedef struct s_option {
+
+	uint16_t	m;
+
+}			t_option;
+
 typedef struct	s_data {
 
 	int32_t			sockfd;
@@ -33,8 +39,8 @@ typedef struct	s_data {
 	// uint16_t		rcvd_pckt_count;
 	uint16_t    	sequence;
 	long double		*rtt_arr;
-	char			*opt_p_payload;
-	// t_option		option;
+	uint16_t		max_hop;
+	t_option		option;
 }			t_data;
 
 typedef struct	s_icmp_pckt {
@@ -52,8 +58,10 @@ char			*resolve_hostname_to_ip(const char *hostname);
 bool			is_private_ip(const char *ip_str);
 long double		get_ping_duration(struct timespec *time_start, struct timespec *time_end);
 
+void	options_init(t_data *data, int ac, char **av);
 void	print_man();
 
+void arg_error_exit_program();
 void    error_exit_program(t_data *data, char *error_message);
 
 #endif

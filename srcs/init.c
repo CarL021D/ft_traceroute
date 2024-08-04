@@ -14,6 +14,8 @@ void	init_data(t_data *data, int ac, char **av) {
 
 	memset(data, 0, sizeof(t_data));
 	
+	options_init(data, ac, av);
+
 	data->ip_addr = resolve_hostname_to_ip(av[ac - 1]);
 	if (!data->ip_addr)
 		exit(EXIT_FAILURE);
@@ -23,7 +25,7 @@ void	init_data(t_data *data, int ac, char **av) {
 		exit(EXIT_FAILURE);
 	}
 	data->payload_size = 56;
-	data->max_ttl = 64;
+	data->max_hop =  !data->option.m ? 64 : data->option.m;
 	data->dns_name = av[ac - 1];
 	data->sequence = 0;
 }

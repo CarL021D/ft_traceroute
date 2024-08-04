@@ -50,7 +50,7 @@ static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, ui
 
 void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 
-	for (uint16_t ttl = 1; ttl <= 64; ttl++) {
+	for (uint16_t ttl = 1; ttl <= data->max_hop; ttl++) {
 
 		for (uint8_t sequence = 0; sequence < 3; sequence++) {
 
@@ -103,6 +103,7 @@ int main(int ac, char **av) {
 	struct sockaddr_in	addr_con;
 
 	check_args_count(ac, av);
+	options_init(&data, ac, av);
 	init_data(&data, ac, av);
 	init_sock_addr(&data, &addr_con, data.ip_addr);
 	print_traceroute_first_output(&data);

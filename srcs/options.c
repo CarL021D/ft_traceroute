@@ -1,5 +1,54 @@
 #include "../includes/ft_traceroute.h"
 
+
+
+void options_init(t_data *data, int ac, char **av) {
+
+	for (uint8_t i = 1; i < (ac - 1); i += 2) {
+		
+		if(!av[i + 1])
+			arg_error_exit_program(data);
+		
+		// if (!strcmp(av[i], "-v")) {
+		// 	data->option.v = 1;
+		// 	i--;
+		// 	continue;
+		// }
+
+		// if (!strcmp(av[i], "-q")) {
+		// 	data->option.q = 1;
+		// 	i--;
+		// 	continue;
+		// }
+
+		// if (!strcmp(av[i], "-f")) {
+		// 	data->option.f = 1;
+		// 	i--;
+		// 	return;
+		// }
+
+
+		for (uint8_t j = 0; av[i + 1][j]; j++)
+			if (!isdigit(av[i + 1][j]))
+				arg_error_exit_program(data);
+
+		if (!strcmp(av[i], "-m")) {
+			data->option.m = atoi(av[i + 1]);
+			return;
+		}
+
+	// 	if (!strcmp(av[i], "-l")) {
+	// 		data->option.l = atoi(av[i + 1]);
+	// 		return;
+	// 	}
+
+	// 	if (!strcmp(av[i], "-c")) {
+	// 		data->option.c = atoi(av[i + 1]);
+	// 		return;
+	// 	}
+	}
+}
+
 void print_man() {
 
     printf("TRACEROUTE                                                              User Commands\n\n"

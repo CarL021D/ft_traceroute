@@ -24,10 +24,10 @@ void	init_data(t_data *data, int ac, char **av) {
 		fprintf(stderr, "Failed to initialize socket\n");
 		exit(EXIT_FAILURE);
 	}
-	data->max_hop =  !data->option.m ? 64 : data->option.m;
-	data->pckt_count =  !data->option.q ? 3 : data->option.q;
+	data->max_hop = !data->option.m ? 64 : data->option.m;
+	data->pckt_count = !data->option.q ? 3 : data->option.q;
+	data->ttl = !data->option.f ? 1 : data->option.f;
 	data->dns_name = av[ac - 1];
-	data->sequence = 0;
 }
 
 void init_sock_addr(t_data *data, struct sockaddr_in *addr_con, char *ip_addr) {    
@@ -42,14 +42,14 @@ void init_sock_addr(t_data *data, struct sockaddr_in *addr_con, char *ip_addr) {
 	addr_con->sin_addr.s_addr = inet_addr(ip_addr);
 }
 
-void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data, uint16_t ttl) {
+void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data) {
 
-	setsockopt(data->sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl));
+	setsockopt(data->sockfd, IPPROTO_IP, IP_TTL, &data->ttl, sizeof(data->ttl));
 
 	memset(pckt, 0, sizeof(t_icmp_pckt));
 	pckt->hdr.type = ICMP_ECHO;
 	pckt->hdr.code = 0;
 	pckt->hdr.un.echo.id = getpid();
-	pckt->hdr.un.echo.sequence = ttl;
+	pckt->hdr.un.echo.sequence = data->ttl;
 	pckt->hdr.checksum = checksum(pckt, sizeof(t_icmp_pckt));
 }

@@ -24,6 +24,7 @@ typedef struct s_option {
 
 	uint16_t	m;
 	uint16_t	q;
+	uint16_t	f;
 
 }			t_option;
 
@@ -41,6 +42,7 @@ typedef struct	s_data {
 	long double		*rtt_arr;
 	uint16_t		max_hop;
 	uint16_t		pckt_count;
+	uint16_t		ttl;
 	t_option		option;
 }			t_data;
 
@@ -52,7 +54,7 @@ typedef struct	s_icmp_pckt {
 
 void	init_sock_addr(t_data *data, struct sockaddr_in *addr_con, char *ip_addr);
 void	init_data(t_data *data, int ac, char **av);
-void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data, uint16_t ttl);
+void	init_icmp_pckt(t_icmp_pckt *pckt, t_data *data);
 
 unsigned short 	checksum(void *b, int len);
 char			*resolve_hostname_to_ip(const char *hostname);

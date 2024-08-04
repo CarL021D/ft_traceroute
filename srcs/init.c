@@ -24,8 +24,8 @@ void	init_data(t_data *data, int ac, char **av) {
 		fprintf(stderr, "Failed to initialize socket\n");
 		exit(EXIT_FAILURE);
 	}
-	data->payload_size = 56;
 	data->max_hop =  !data->option.m ? 64 : data->option.m;
+	data->pckt_count =  !data->option.q ? 3 : data->option.q;
 	data->dns_name = av[ac - 1];
 	data->sequence = 0;
 }

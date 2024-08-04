@@ -52,7 +52,7 @@ void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 
 	for (uint16_t ttl = 1; ttl <= data->max_hop; ttl++) {
 
-		for (uint8_t sequence = 0; sequence < 3; sequence++) {
+		for (uint8_t sequence = 0; sequence < data->pckt_count; sequence++) {
 
 			t_icmp_pckt pckt;
 			char buffer[sizeof(struct iphdr) + sizeof(t_icmp_pckt)];
@@ -84,7 +84,7 @@ void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 				memcpy(rcvd_pckt.payload, buffer + (ip_hdr->ihl * 4) + sizeof(struct icmphdr), PAYLOAD_SIZE);
 			
 				print_route_infos(ip_hdr, icmp_hdr, ttl, sequence, rtt_msec);	
-				if (sequence == 2 && icmp_hdr->type == ICMP_ECHOREPLY) {
+				if (sequence == (data->pckt_count - 1) && icmp_hdr->type == ICMP_ECHOREPLY) {
 					printf("\n");
 					return;
 				}

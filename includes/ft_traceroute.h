@@ -23,13 +23,13 @@
 typedef struct s_option {
 
 	uint16_t	m;
+	uint16_t	q;
 
 }			t_option;
 
 typedef struct	s_data {
 
 	int32_t			sockfd;
-	uint8_t    		payload_size;
 	uint8_t    		max_ttl;
 	double			sleep_time;
 	char			*dns_name;
@@ -40,6 +40,7 @@ typedef struct	s_data {
 	uint16_t    	sequence;
 	long double		*rtt_arr;
 	uint16_t		max_hop;
+	uint16_t		pckt_count;
 	t_option		option;
 }			t_data;
 

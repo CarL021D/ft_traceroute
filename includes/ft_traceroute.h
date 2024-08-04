@@ -52,6 +52,8 @@ char			*resolve_hostname_to_ip(const char *hostname);
 bool			is_private_ip(const char *ip_str);
 long double		get_ping_duration(struct timespec *time_start, struct timespec *time_end);
 
+void	print_man();
 
 void    error_exit_program(t_data *data, char *error_message);
+
 #endif

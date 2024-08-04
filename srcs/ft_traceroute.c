@@ -9,6 +9,7 @@ void check_args_count(int ac, char **av) {
 
 	for (uint8_t i = 1; i < ac; i++) {
 		if (!strcmp(av[i], "-?") || !strcmp(av[i], "--help")) {
+			print_man();
 			exit(EXIT_SUCCESS);
 		}
 	}
@@ -101,7 +102,6 @@ int main(int ac, char **av) {
 	t_data				data;
 	struct sockaddr_in	addr_con;
 
-	signal(SIGINT, sig_handler);
 	check_args_count(ac, av);
 	init_data(&data, ac, av);
 	init_sock_addr(&data, &addr_con, data.ip_addr);

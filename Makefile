@@ -1,9 +1,10 @@
 NAME = ft_traceroute
 
 SRCS = srcs/ft_traceroute.c			\
-       srcs/values_init.c	        \
+       srcs/init.c	        		\
        srcs/error_handler.c	        \
-	   srcs/utils.c
+	   srcs/utils.c					\
+	   srcs/options.c
 
 OBJS = ${SRCS:.c=.o}
 

@@ -9,11 +9,11 @@ void options_init(t_data *data, int ac, char **av) {
 		if(!av[i + 1])
 			arg_error_exit_program(data);
 		
-		// if (!strcmp(av[i], "-v")) {
-		// 	data->option.v = 1;
-		// 	i--;
-		// 	continue;
-		// }
+		if (!strcmp(av[i], "--resolve-hostnames")) {
+			data->option.res_host_name = 1;
+			i--;
+			continue;
+		}
 
 		// if (!strcmp(av[i], "-q")) {
 		// 	data->option.q = 1;

@@ -45,10 +45,10 @@ static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, t_
 		data->host_name = ip_to_hostname(inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
 		if (!data->host_name)
 			error_exit_program(data, "malloc fail");
-		//if(!optionaddr && !strcmp(data->host_name, "no hostname found"))
+		if(!data->option.res_host_name || !strcmp(data->host_name, "no hostname found"))
 			printf("   %s", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
-		// else
-			// printf("   %s (%s)", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr), data->host_name);
+		else
+			printf("   %s (%s)", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr), data->host_name);
 		free(data->host_name);
 	}
 

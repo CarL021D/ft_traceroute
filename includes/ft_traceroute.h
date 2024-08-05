@@ -26,6 +26,7 @@ typedef struct s_option {
 	uint16_t	m;
 	uint16_t	q;
 	uint16_t	w;
+	uint8_t		res_host_name;
 
 }			t_option;
 

@@ -39,7 +39,6 @@ static bool wait_response(t_data *data)
 
 static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, t_data *data, uint8_t sequence, long double rtt_msec) {
 
-
 	if (!sequence || (icmp_hdr->type == ICMP_ECHOREPLY && !sequence)) {
 	
 		data->host_name = ip_to_hostname(inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
@@ -51,7 +50,6 @@ static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, t_
 			printf("   %s (%s)", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr), data->host_name);
 		free(data->host_name);
 	}
-
 	
 	if (icmp_hdr->type == ICMP_TIME_EXCEEDED || icmp_hdr->type == ICMP_ECHOREPLY)
 		printf("   %.3Lfms", rtt_msec);

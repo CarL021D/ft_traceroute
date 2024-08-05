@@ -38,9 +38,6 @@ typedef struct	s_data {
 	char			*dns_name;
 	char 			*ip_addr;
 	char 			*host_name;
-	// uint16_t   		icmp_pckt_size;
-	// uint16_t		sent_pckt_count;
-	// uint16_t		rcvd_pckt_count;
 	uint16_t    	sequence;
 	long double		*rtt_arr;
 	uint16_t		max_hop;

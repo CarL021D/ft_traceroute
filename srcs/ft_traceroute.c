@@ -37,15 +37,26 @@ static bool wait_response(t_data *data)
 	return true;
 }
 
-static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, uint16_t ttl, uint8_t sequence, long double rtt_msec) {
+static void print_route_infos(struct iphdr *ip_hdr, struct icmphdr *icmp_hdr, t_data *data, uint8_t sequence, long double rtt_msec) {
 
-	if (!sequence || (icmp_hdr->type == ICMP_ECHOREPLY && !sequence))
-		printf("   %s", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
+
+	if (!sequence || (icmp_hdr->type == ICMP_ECHOREPLY && !sequence)) {
+	
+		data->host_name = ip_to_hostname(inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
+		if (!data->host_name)
+			error_exit_program(data, "malloc fail");
+		//if(!optionaddr && !strcmp(data->host_name, "no hostname found"))
+			printf("   %s", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr));
+		// else
+			// printf("   %s (%s)", inet_ntoa(*(struct in_addr *)&ip_hdr->saddr), data->host_name);
+		free(data->host_name);
+	}
+
+	
 	if (icmp_hdr->type == ICMP_TIME_EXCEEDED || icmp_hdr->type == ICMP_ECHOREPLY)
 		printf("   %.3Lfms", rtt_msec);
 	else 
 		printf("   *");
-	(void)ttl;
 }
 
 void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
@@ -83,7 +94,7 @@ void trace_pckt_route(t_data *data, struct sockaddr_in *addr_con) {
 				memcpy(&rcvd_pckt.hdr, icmp_hdr, sizeof(struct icmphdr));
 				memcpy(rcvd_pckt.payload, buffer + (ip_hdr->ihl * 4) + sizeof(struct icmphdr), PAYLOAD_SIZE);
 			
-				print_route_infos(ip_hdr, icmp_hdr, data->ttl, sequence, rtt_msec);	
+				print_route_infos(ip_hdr, icmp_hdr, data, sequence, rtt_msec);	
 				if (sequence == (data->pckt_count - 1) && icmp_hdr->type == ICMP_ECHOREPLY) {
 					printf("\n");
 					return;

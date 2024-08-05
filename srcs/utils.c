@@ -34,6 +34,26 @@ char *resolve_hostname_to_ip(const char *hostname) {
 	return ip_addr;
 }
 
+char	*ip_to_hostname(char* ip_addr) {
+    struct sockaddr_in sa;
+    struct hostent *he;
+    char *host_name;
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET;
+
+    inet_pton(AF_INET, ip_addr, &sa.sin_addr);
+    he = gethostbyaddr(&sa.sin_addr, sizeof(sa.sin_addr), AF_INET);
+    if (!he)
+        return strdup("no hostname found");
+    host_name = strdup(he->h_name);
+    if (!host_name)
+        return (NULL);
+    return host_name;
+}
+
+
+
 long double get_ping_duration(struct timespec *time_start, struct timespec *time_end) {
 
 	long double rtt_msec;

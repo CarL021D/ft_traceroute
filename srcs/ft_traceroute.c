@@ -23,7 +23,7 @@ void print_traceroute_first_output(t_data *data) {
 
 static bool wait_response(t_data *data)
 {
-	struct timeval tv = {1, 0};
+	struct timeval tv = {data->t_to_wait, 0};
 
 	fd_set readfds;
 	FD_ZERO(&readfds);

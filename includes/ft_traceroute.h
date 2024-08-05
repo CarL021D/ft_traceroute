@@ -25,6 +25,7 @@ typedef struct s_option {
 	uint16_t	m;
 	uint16_t	q;
 	uint16_t	f;
+	uint16_t	w;
 
 }			t_option;
 
@@ -43,6 +44,7 @@ typedef struct	s_data {
 	uint16_t		max_hop;
 	uint16_t		pckt_count;
 	uint16_t		ttl;
+	uint16_t		t_to_wait;
 	t_option		option;
 }			t_data;
 

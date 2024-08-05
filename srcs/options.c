@@ -47,7 +47,10 @@ void options_init(t_data *data, int ac, char **av) {
 			// return;
 		}
 
-
+		if (!strcmp(av[i], "-w")) {
+			data->option.w = atoi(av[i + 1]);
+			// return;
+		}
 	// 	if (!strcmp(av[i], "-c")) {
 	// 		data->option.c = atoi(av[i + 1]);
 	// 		return;

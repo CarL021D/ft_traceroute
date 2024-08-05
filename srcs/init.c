@@ -27,6 +27,7 @@ void	init_data(t_data *data, int ac, char **av) {
 	data->max_hop = !data->option.m ? 64 : data->option.m;
 	data->pckt_count = !data->option.q ? 3 : data->option.q;
 	data->ttl = !data->option.f ? 1 : data->option.f;
+	data->t_to_wait = !data->option.w ? 1 : data->option.w;
 	data->dns_name = av[ac - 1];
 }
 
